@@ -1,0 +1,26 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aiolichess"
+version = "1.0.0"
+description = "Async Python client for the Lichess REST API"
+readme = "README.md"
+license = { file = "LICENSE" }
+classifiers = [
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+]
+requires-python = ">=3.11"
+dependencies = [
+    "aiohttp>=3.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/aryanhasgithub/aiolichess"
+Issues = "https://github.com/aryanhasgithub/aiolichess/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["aiolichess"]
+
+
