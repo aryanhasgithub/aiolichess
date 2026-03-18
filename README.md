@@ -59,6 +59,56 @@ Returns a `LichessUser` object.
 
 ---
 
+### `await client.get_user_id(token)`
+
+Fetches only the user ID of the authenticated user.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `token` | `str` | Lichess personal API token |
+
+Returns a `str`.
+```python
+user_id = await client.get_user_id(token="your_pat_here")
+print(user_id)  # "drnykterstien"
+```
+
+---
+
+### `await client.get_username(token)`
+
+Fetches only the username of the authenticated user.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `token` | `str` | Lichess personal API token |
+
+Returns a `str`.
+```python
+username = await client.get_username(token="your_pat_here")
+print(username)  # "DrNykterstein"
+```
+
+---
+
+### `await client.get_statistics(token)`
+
+Fetches rating and game count statistics across all formats.
+
+| Parameter | Type | Description |
+|---|---|---|
+| `token` | `str` | Lichess personal API token |
+
+Returns a `LichessStatistics` object.
+```python
+stats = await client.get_statistics(token="your_pat_here")
+print(stats.blitz_rating)
+print(stats.rapid_games)
+print(stats.puzzle_rating)
+```
+
+---
+
 ### `await client.close()`
 
 Closes the session. Only closes if the session was created internally — never closes an externally provided session.
@@ -111,6 +161,22 @@ Closes the session. Only closes if the session was created internally — never 
 | `win` | `int` |
 | `loss` | `int` |
 | `draw` | `int` |
+
+**`LichessStatistics`**
+
+| Field | Type |
+|---|---|
+| `bullet_rating` | `int \| None` |
+| `blitz_rating` | `int \| None` |
+| `rapid_rating` | `int \| None` |
+| `classical_rating` | `int \| None` |
+| `puzzle_rating` | `int \| None` |
+| `correspondence_rating` | `int \| None` |
+| `bullet_games` | `int \| None` |
+| `blitz_games` | `int \| None` |
+| `rapid_games` | `int \| None` |
+| `classical_games` | `int \| None` |
+| `puzzle_games` | `int \| None` |
 
 ---
 

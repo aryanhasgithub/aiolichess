@@ -2,7 +2,7 @@
 from __future__ import annotations
 import aiohttp
 from .exceptions import AuthError, RateLimitError, LichessServerError, AioLichessError
-from .models import LichessUser, LichessPerf, LichessProfile, LichessCount
+from .models import LichessUser, LichessPerf, LichessProfile, LichessCount, LichessStatistics
 
 BASE_URL = "https://lichess.org"
 
@@ -42,14 +42,16 @@ class AioLichess:
         except aiohttp.ClientError as err:
             raise AioLichessError(f"Network error: {err}") from err
 
+    async def _fetch_account(self, token: str) -> dict:
+        """Fetch raw account data."""
+        return await self._request("/api/account", token)
+
     async def get_all(self, token: str) -> LichessUser:
         """Get all account information for the authenticated user."""
-        data = await self._request("/api/account", token)
+        data = await self._fetch_account(token)
 
-        # parse perfs
         perfs: dict[str, LichessPerf] = {}
         for format_name, perf_data in data.get("perfs", {}).items():
-            # skip non-rating perfs like storm/racer
             if "rating" not in perf_data:
                 continue
             perfs[format_name] = LichessPerf(
@@ -60,7 +62,6 @@ class AioLichess:
                 prov=perf_data.get("prov", False),
             )
 
-        # parse profile
         profile = None
         if raw_profile := data.get("profile"):
             profile = LichessProfile(
@@ -72,7 +73,6 @@ class AioLichess:
                 ecf_rating=raw_profile.get("ecfRating"),
             )
 
-        # parse count
         count = None
         if raw_count := data.get("count"):
             count = LichessCount(
@@ -93,6 +93,44 @@ class AioLichess:
             perfs=perfs,
             profile=profile,
             count=count,
+        )
+
+    async def get_user_id(self, token: str) -> str:
+        """Get the user ID of the authenticated user."""
+        data = await self._fetch_account(token)
+        return data["id"]
+
+    async def get_username(self, token: str) -> str:
+        """Get the username of the authenticated user."""
+        data = await self._fetch_account(token)
+        return data["username"]
+
+    async def get_statistics(self, token: str) -> LichessStatistics:
+        """Get rating statistics for all formats."""
+        data = await self._fetch_account(token)
+
+        perfs = data.get("perfs", {})
+
+        def _rating(key: str) -> int | None:
+            p = perfs.get(key)
+            return p["rating"] if p and "rating" in p else None
+
+        def _games(key: str) -> int | None:
+            p = perfs.get(key)
+            return p["games"] if p and "games" in p else None
+
+        return LichessStatistics(
+            bullet_rating=_rating("bullet"),
+            blitz_rating=_rating("blitz"),
+            rapid_rating=_rating("rapid"),
+            classical_rating=_rating("classical"),
+            puzzle_rating=_rating("puzzle"),
+            correspondence_rating=_rating("correspondence"),
+            bullet_games=_games("bullet"),
+            blitz_games=_games("blitz"),
+            rapid_games=_games("rapid"),
+            classical_games=_games("classical"),
+            puzzle_games=_games("puzzle"),
         )
 
     async def close(self) -> None:

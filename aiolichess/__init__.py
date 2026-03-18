@@ -13,4 +13,5 @@ __all__ = [
     "LichessPerf",
     "LichessProfile",
     "LichessCount",
+    "LichessStatistics"
 ]

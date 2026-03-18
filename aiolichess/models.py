@@ -50,3 +50,19 @@ class LichessUser:
     perfs: dict[str, LichessPerf] = field(default_factory=dict)
     profile: LichessProfile | None = None
     count: LichessCount | None = None
+
+@dataclass
+class LichessStatistics:
+    """Represents a user's rating statistics across all formats."""
+
+    bullet_rating: int | None = None
+    blitz_rating: int | None = None
+    rapid_rating: int | None = None
+    classical_rating: int | None = None
+    puzzle_rating: int | None = None
+    correspondence_rating: int | None = None
+    bullet_games: int | None = None
+    blitz_games: int | None = None
+    rapid_games: int | None = None
+    classical_games: int | None = None
+    puzzle_games: int | None = None
